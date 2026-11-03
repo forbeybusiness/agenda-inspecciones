@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agenda de Inspecciones Etapa I</title>
+<meta name="theme-color" content="#0d5c63">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Inspecciones PS">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>window.__bip=null;addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__bip=e;window.dispatchEvent(new Event("bip-ready"))});</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+
+/* Layout: control strip arriba; calendario mensual (izq) + panel del día con sus 5 turnos (der); listado de 144 unidades abajo */
+:root{
+  --bg:#f3f6f6; --surface:#ffffff; --sunk:#e8eeee; --line:#d3dcdc;
+  --fg:#14272a; --muted:#5b6f72;
+  --accent:#0d5c63; --accent-soft:#d6ebec; --on-accent:#ffffff;
+  --ok:#2c7a3f; --ok-soft:#dcefe0; --warn:#a2610b; --warn-soft:#f7e9d2; --bad:#a33a2f; --bad-soft:#f6dcd8;
+  --full:#7a8c8e;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1819; --surface:#152224; --sunk:#1b2b2d; --line:#2a3d40; --fg:#e3eced; --muted:#93a7aa;
+  --accent:#5fb7bd; --accent-soft:#163b3e; --on-accent:#081314;
+  --ok:#7cc98e; --ok-soft:#173222; --warn:#e2a956; --warn-soft:#3a2a12; --bad:#ec8a7e; --bad-soft:#3d1c18; --full:#6b7f82; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1819; --surface:#152224; --sunk:#1b2b2d; --line:#2a3d40; --fg:#e3eced; --muted:#93a7aa;
+  --accent:#5fb7bd; --accent-soft:#163b3e; --on-accent:#081314;
+  --ok:#7cc98e; --ok-soft:#173222; --warn:#e2a956; --warn-soft:#3a2a12; --bad:#ec8a7e; --bad-soft:#3d1c18; --full:#6b7f82; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.45}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:1.7rem;font-weight:700}
+h2{font-size:1.15rem;font-weight:700}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.small{padding:4px 9px;font-size:.82rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+header.top{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:flex-end;justify-content:space-between}
+.stats{display:flex;flex-wrap:wrap;gap:22px}
+.stat b{display:block;font-family:var(--f-display);font-size:1.5rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:.78rem;color:var(--muted)}
+.rules{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.82rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.rules strong{color:var(--fg);font-weight:600}
+.banner{padding:10px 14px;border-radius:8px;background:var(--warn-soft);color:var(--warn);font-weight:500}
+
+.main{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+
+.calhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.calhead h2{text-transform:capitalize}
+.calnav{display:flex;gap:6px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.dow{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:center;padding-bottom:4px;font-weight:600}
+.day{min-height:96px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:5px;text-align:left;display:flex;flex-direction:column;gap:3px;min-width:0}
+.day:hover{border-color:var(--accent)}
+.day.out{opacity:.35}
+.day.closed{background:var(--sunk);cursor:default}
+.day.closed:hover{border-color:var(--line)}
+.day.past{background:var(--sunk)}
+.day.sel{outline:2px solid var(--accent);outline-offset:-1px}
+.day.today .dnum{background:var(--accent);color:var(--on-accent);border-radius:5px;padding:0 5px}
+.drow{display:flex;justify-content:space-between;align-items:center;gap:4px}
+.dnum{font-weight:600;font-variant-numeric:tabular-nums;font-size:.85rem}
+.cap{font-family:var(--f-mono);font-size:.68rem;padding:1px 5px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.cap.full{background:var(--full);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:2px}
+.chip{font-family:var(--f-mono);font-size:.66rem;padding:0 4px;border-radius:3px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.chip.done{background:var(--ok-soft);color:var(--ok)}
+.chip.miss{background:var(--bad-soft);color:var(--bad);text-decoration:line-through}
+.closedlbl{font-size:.68rem;color:var(--muted)}
+.opens{font-size:.64rem;font-weight:600;color:var(--warn);background:var(--warn-soft);border-radius:3px;padding:0 4px;align-self:flex-start}
+.habil{font-size:.8rem;color:var(--muted);margin-top:4px}
+.habil strong{color:var(--fg)}
+@media (max-width:560px){.day{min-height:62px}.chip{font-size:.58rem}.chips .chip:nth-child(n+3){display:none}.cap{font-size:.6rem}}
+
+.slots{display:grid;gap:8px;margin-top:12px}
+.slot{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;align-items:start}
+.slot .hr{font-family:var(--f-mono);font-size:.95rem;color:var(--muted);padding-top:2px}
+.slot.free{border-style:dashed;background:var(--sunk)}
+.slot .who{font-weight:600}
+.slot .unit{font-family:var(--f-mono);color:var(--accent);font-weight:500}
+.slot .meta{font-size:.8rem;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.slot .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pill{display:inline-block;font-size:.72rem;font-weight:600;padding:1px 8px;border-radius:99px;margin-left:6px;vertical-align:1px}
+.pill.Agendada{background:var(--accent-soft);color:var(--accent)}
+.pill.Realizada{background:var(--ok-soft);color:var(--ok)}
+.pill.NoAsistio{background:var(--bad-soft);color:var(--bad)}
+.tipo{font-size:.72rem;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:1px 7px;border-radius:99px}
+.empty{color:var(--muted);font-size:.9rem;padding:8px 0}
+
+form.book{display:grid;gap:10px;margin-top:10px;padding:12px;border-radius:10px;background:var(--sunk)}
+.field{display:grid;gap:4px}
+.field label{font-size:.78rem;font-weight:600;color:var(--muted)}
+.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:7px;padding:7px 9px;background:var(--surface);width:100%;min-width:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.owner{font-weight:600;min-height:1.4em}
+.err{color:var(--bad);font-size:.85rem;font-weight:500}
+.confirm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.82rem;color:var(--bad);margin-top:6px}
+
+.listhead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.filters input,.filters select{border:1px solid var(--line);border-radius:7px;padding:6px 9px;background:var(--surface)}
+.filters input{width:220px;max-width:100%}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th{text-align:left;font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line);padding:6px 8px;white-space:nowrap}
+td{border-bottom:1px solid var(--line);padding:6px 8px;vertical-align:top}
+td.u{font-family:var(--f-mono);white-space:nowrap;color:var(--accent)}
+td.d{white-space:nowrap;font-variant-numeric:tabular-nums}
+.st{font-size:.72rem;color:var(--muted)}
+.dash{color:var(--muted)}
+tr.clickable{cursor:pointer}
+tr.clickable:hover td{background:var(--sunk)}
+td.pg{min-width:170px}
+td.en{min-width:150px}
+tr.edrow td{background:var(--sunk);padding:4px}
+tr.edrow form.book{margin:0;max-width:560px}
+.okt{color:var(--ok)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:500;z-index:20;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:no-preference){.day,.btn{transition:border-color .12s}}
+
+.loginwrap{min-height:100vh;display:grid;place-items:center;padding-block:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.loginbox{width:100%;max-width:380px;display:grid;gap:12px}
+.loginbox .btn.primary{padding:9px 12px}
+.linkbtn{background:none;border:0;color:var(--accent);text-decoration:underline;padding:0;justify-self:start;font-size:.85rem}
+.muted{color:var(--muted);margin:0}
+.userbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;font-size:.85rem;border-bottom:1px solid var(--line);padding-bottom:10px}
+.ubacts{display:flex;gap:6px;flex-wrap:wrap}
+.rolechip{font-size:.72rem;font-weight:600;padding:1px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);margin-left:4px}
+.rolehelp{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.8rem;color:var(--muted);margin-bottom:10px}
+.rolehelp strong{color:var(--fg)}
+@media (max-width:560px){.drow{flex-wrap:wrap;gap:1px}.opens{font-size:.55rem;padding:0 2px}}
+.installhelp{position:fixed;inset:0;background:rgba(10,20,22,.55);display:grid;place-items:center;z-index:30;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.installhelp .panel{max-width:380px;display:grid;gap:10px}
+.installhelp ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.installrow{display:flex;gap:10px;align-items:center}
+.installrow img{width:44px;height:44px;border-radius:10px}
+td select{border:1px solid var(--line);border-radius:6px;padding:3px 6px;background:var(--surface)}
+</style>
+</head>
+<body>
+<!-- ===== Pantalla de acceso ===== -->
+<div id="loginView" class="loginwrap" hidden>
+  <form class="loginbox panel" id="loginForm" autocomplete="on">
+    <div class="eyebrow">Prado Suites Puerto Plata · Etapa I</div>
+    <h1>Agenda de inspecciones</h1>
+    <div class="field"><label for="lgEmail">Correo</label><input id="lgEmail" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="lgPass">Contraseña</label><input id="lgPass" type="password" autocomplete="current-password" required></div>
+    <div class="err" id="lgErr"></div>
+    <button class="btn primary" type="submit" id="lgBtn">Entrar</button>
+    <button class="linkbtn" type="button" id="lgReset">Olvidé mi contraseña</button>
+    <button class="btn installBtn" type="button" hidden>Instalar app en este equipo</button>
+  </form>
+</div>
+
+<!-- ===== Mensajes de estado (cargando, sin acceso, configuración) ===== -->
+<div id="msgView" class="loginwrap" hidden>
+  <div class="loginbox panel">
+    <h2 id="msgTitle">Cargando…</h2>
+    <p id="msgText" class="muted"></p>
+    <button class="btn" id="msgLogout" hidden>Salir</button>
+  </div>
+</div>
+
+<!-- ===== App ===== -->
+<div class="wrap" id="appView" hidden>
+  <div class="userbar">
+    <span><strong id="ubName"></strong> <span class="rolechip" id="ubRole"></span></span>
+    <span class="ubacts">
+      <button class="btn small installBtn" type="button" hidden>Instalar app</button>
+      <button class="btn small" id="usersBtn" hidden>Usuarios</button>
+      <button class="btn small" id="pwBtn">Cambiar contraseña</button>
+      <button class="btn small" id="logoutBtn">Salir</button>
+    </span>
+  </div>
+  <header class="top">
+    <div>
+      <div class="eyebrow">Prado Suites Puerto Plata · Etapa I · Edificios 1–9</div>
+      <h1>Agenda de inspecciones</h1>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="stAg">0</b><span>citas agendadas</span></div>
+      <div class="stat"><b id="stRe">0</b><span>inspecciones realizadas</span></div>
+      <div class="stat"><b id="stPend">—</b><span>unidades sin 1ra inspección</span></div>
+      <div class="stat"><b id="stEnt">0</b><span id="stEntLbl">unidades entregadas</span></div>
+    </div>
+  </header>
+  <div class="rules">
+    <span><strong>Lun–Vie:</strong> 9:00, 10:00 · 1:00, 2:00, 3:00 p.m. (5 citas)</span>
+    <span><strong>Sábado:</strong> 9:00 y 10:00 a.m. (hasta las 11)</span>
+    <span><strong>Domingo:</strong> cerrado</span>
+    <span>Una cita por unidad y tipo de inspección</span>
+    <span><strong>Habilitación:</strong> Edif. 6, 7, 5 desde 26/10 · 8, 9 desde 03/11 · 4, 3 desde 13/11 · 2, 1 desde 30/11</span>
+  </div>
+  <div id="banner" class="banner" hidden></div>
+  <div id="rosterMissing" class="banner" hidden><span id="rosterMissingTxt"></span></div>
+
+  <!-- Panel de usuarios (solo administradores) -->
+  <section class="panel" id="usersPanel" hidden aria-label="Usuarios">
+    <div class="listhead"><h2>Usuarios</h2><button class="btn small" id="usersClose">Cerrar</button></div>
+    <div class="rolehelp">
+      <span><strong>Administrador:</strong> todo, más crear y desactivar usuarios</span>
+      <span><strong>Agenda:</strong> agenda citas, marca inspecciones, pagos y entregas</span>
+      <span><strong>Solo lectura:</strong> ve la agenda sin cambiar nada</span>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th></tr></thead>
+      <tbody id="usersBody"></tbody>
+    </table></div>
+    <div class="book">
+      <h3>Listado de propietarios</h3>
+      <p class="muted" id="rosterInfo"></p>
+      <div class="field"><label for="rosterFile">Cargar listado de propietarios (Excel con hoja CLIENTES: EDIFICIO, Apartamento, Estatus, NOMBRE DEL ADQUIRIENTE)</label>
+        <input id="rosterFile" type="file" accept=".xlsx,.xls,.csv"></div>
+      <div class="err" id="rosterErr"></div><div class="okt" id="rosterOk"></div>
+      <p class="muted st">Al cargar un archivo nuevo se reemplaza el listado completo. Las citas, pagos y entregas no se pierden.</p>
+    </div>
+    <form class="book" id="nuForm" autocomplete="off">
+      <h3>Nuevo usuario</h3>
+      <div class="row2">
+        <div class="field"><label for="nuNombre">Nombre</label><input id="nuNombre" required></div>
+        <div class="field"><label for="nuEmail">Correo</label><input id="nuEmail" type="email" required></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="nuPass">Contraseña inicial</label><input id="nuPass" type="text" minlength="6" required placeholder="Mínimo 6 caracteres"></div>
+        <div class="field"><label for="nuRol">Rol</label><select id="nuRol"><option value="agenda">Agenda</option><option value="lectura">Solo lectura</option><option value="admin">Administrador</option></select></div>
+      </div>
+      <div class="err" id="nuErr"></div>
+      <div><button class="btn primary" type="submit" id="nuBtn">Crear usuario</button></div>
+    </form>
+  </section>
+
+  <!-- Cambio de contraseña -->
+  <section class="panel" id="pwPanel" hidden aria-label="Cambiar contraseña">
+    <form class="book" id="pwForm" autocomplete="off" style="margin:0">
+      <h3>Cambiar contraseña</h3>
+      <div class="row2">
+        <div class="field"><label for="pwOld">Contraseña actual</label><input id="pwOld" type="password" autocomplete="current-password" required></div>
+        <div class="field"><label for="pwNew">Contraseña nueva</label><input id="pwNew" type="password" autocomplete="new-password" minlength="6" required></div>
+      </div>
+      <div class="err" id="pwErr"></div>
+      <div style="display:flex;gap:8px"><button class="btn primary" type="submit">Guardar</button><button class="btn" type="button" id="pwClose">Cerrar</button></div>
+    </form>
+  </section>
+
+  <div class="main">
+    <section class="panel" aria-label="Calendario">
+      <div class="calhead">
+        <h2 id="monthLbl"></h2>
+        <div class="calnav">
+          <button class="btn small" id="prevM" aria-label="Mes anterior">‹</button>
+          <button class="btn small" id="todayM">Hoy</button>
+          <button class="btn small" id="nextM" aria-label="Mes siguiente">›</button>
+        </div>
+      </div>
+      <div class="cal" id="cal"></div>
+    </section>
+    <section class="panel" aria-label="Día seleccionado">
+      <div class="eyebrow" id="dayEyebrow">Día seleccionado</div>
+      <h2 id="dayTitle"></h2>
+      <div id="dayBody"></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-label="Unidades">
+    <div class="listhead">
+      <h2>Unidades y propietarios</h2>
+      <div class="filters">
+        <input id="q" type="search" placeholder="Buscar unidad o propietario">
+        <select id="fEd" aria-label="Edificio"><option value="">Todos los edificios</option></select>
+        <select id="fSt" aria-label="Estado">
+          <option value="">Todas</option>
+          <option value="sin">Sin cita</option>
+          <option value="ag">Con cita agendada</option>
+          <option value="re">Inspeccionadas</option>
+          <option value="ent">Entregadas</option>
+          <option value="noent">Pendientes de entrega</option>
+        </select>
+        <button class="btn small" id="exportBtn">Exportar a Excel</button>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Unidad</th><th>Propietario</th><th>1ra inspección</th><th>2da inspección</th><th>Forma de pago</th><th>Entrega</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+<!-- Instrucciones para iPhone / iPad (Safari no tiene botón de instalación automática) -->
+<div class="installhelp" id="iosHelp" hidden>
+  <div class="panel" role="dialog" aria-labelledby="iosTitle">
+    <div class="installrow"><img src="icons/apple-touch-icon.png" alt=""><h2 id="iosTitle">Instalar en iPhone o iPad</h2></div>
+    <ol>
+      <li>Abra esta página en <strong>Safari</strong>.</li>
+      <li>Pulse el botón <strong>Compartir</strong> (el cuadrado con la flecha hacia arriba).</li>
+      <li>Elija <strong>Agregar a pantalla de inicio</strong> y pulse <strong>Agregar</strong>.</li>
+    </ol>
+    <p class="muted">El ícono «Inspecciones PS» aparecerá junto a sus otras apps.</p>
+    <button class="btn primary" type="button" id="iosClose">Entendido</button>
+  </div>
+</div>
+
+<script type="module">
+/* ================== Datos fijos del proyecto ================== */
+// El listado de propietarios se guarda en la base de datos protegida (config/propietarios), no en esta página.
+let UNITS = [], UMAP = {}, rosterInfo = null;
+const WEEKDAY = ["09:00","10:00","13:00","14:00","15:00"];
+const SATURDAY = ["09:00","10:00"];
+const TIPOS = {"1ra":"1ra inspección","2da":"2da inspección"};
+// Fecha hábil desde la cual cada edificio puede inspeccionarse (orden 6 → 7 → 5 → 8 → 9 → 4 → 3 → 2 → 1)
+const HABIL = {6:"2026-10-26",7:"2026-10-26",5:"2026-10-26",8:"2026-11-03",9:"2026-11-03",4:"2026-11-13",3:"2026-11-13",2:"2026-11-30",1:"2026-11-30"};
+const ORDEN = [6,7,5,8,9,4,3,2,1];
+// Entidades de intermediación financiera autorizadas (BCRD / Superintendencia de Bancos)
+const BANCOS = [
+  ["Bancos múltiples",["Banco Popular Dominicano","Banreservas","Banco BHD","Scotiabank","Banco Santa Cruz","Banco Caribe","Banco BDI","Banco Vimenca","Banco López de Haro","Banco Promerica","Banesco","Banco Lafise","Banco Ademi","JMMB Bank","Qik Banco Digital","Citibank"]],
+  ["Asociaciones de ahorros y préstamos",["APAP (Asociación Popular)","Asociación Cibao","Asociación La Nacional","Asociación Duarte","Asociación La Vega Real","Asociación Romana","Asociación Mocana","Asociación Bonao","Asociación Maguana","Asociación Peravia"]],
+  ["Bancos de ahorro y crédito",["Banco Adopem","Bancotuí","Banco Atlántico","Banco Confisa","Leasing Confisa","Motor Crédito","Banco BACC","Banco Cofaci","Banco Gruficorp","Bonanza Banco","Banco Fihogar","Banco Unión","Banfondesa","Banco Óptima"]],
+  ["Corporaciones de crédito",["Nordestana de Préstamos","Oficorp","Corporación Monumental"]],
+  ["Entidades públicas y otras",["Banco Agrícola","BANDEX","INVI / Fondo de pensiones","Otra entidad"]]
+];
+const PAGO_LBL = {Bancario:"Financiamiento bancario",Efectivo:"Pago en efectivo",Permuta:"Saldo por permuta"};
+const ROL_LBL = {admin:"Administrador",agenda:"Agenda",lectura:"Solo lectura"};
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+
+/* ================== Estado ================== */
+let api = null, me = null, myId = null, canWrite = false, isAdmin = false;
+let citas = {}, pagos = {}, entregas = {}, usuarios = {};
+let unsubs = [];
+let now = new Date(), todayStr = ymd(now);
+let viewY = now.getFullYear(), viewM = now.getMonth();
+let selDate = todayStr;
+let formState = null, editorState = null, entregaState = null, confirmDel = null;
+
+/* ================== Utilidades ================== */
+function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parse(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
+function slotsFor(s){const g=parse(s).getDay();return g===0?[]:g===6?SATURDAY:WEEKDAY}
+function hr12(h){let [H,M]=h.split(":").map(Number);const ap=H>=12?"p.m.":"a.m.";H=H%12||12;return H+":"+String(M).padStart(2,"0")+" "+ap}
+function slotId(date,h){return date+"_"+h.replace(":","")}
+function unitLbl(u){const x=UMAP[u];return x?("Edif. "+x.e+" · Apto "+x.a):u}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function fmtLong(s){const d=parse(s);return DIAS[d.getDay()]+" "+d.getDate()+" de "+MESES[d.getMonth()]+" "+d.getFullYear()}
+function fmtShort(s){if(!s)return "";const d=parse(s);return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()}
+function toast(msg){const t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2800)}
+function $(id){return document.getElementById(id)}
+function byDate(){const m={};for(const [id,c] of Object.entries(citas)){(m[c.fecha]??=[]).push({id,...c})}return m}
+function unitCitas(u){return Object.entries(citas).filter(([,c])=>c.unidad===u).map(([id,c])=>({id,...c}))}
+function pillCls(e){return e==="No asistió"?"NoAsistio":e}
+function habilitados(f){return ORDEN.filter(e=>HABIL[e]<=f)}
+function abrenEn(f){return ORDEN.filter(e=>HABIL[e]===f)}
+function nameOf(uid){return usuarios[uid]?.nombre||"—"}
+function stamp(){return {actualizadoEn:new Date().toISOString(),actualizadoPor:myId}}
+function errMsg(e){
+  if(e?.userMessage)return e.userMessage;
+  const c=e?.code||"";
+  if(c.includes("permission-denied"))return "No tiene permiso para esta acción o la cita no cumple las reglas de la agenda.";
+  if(c.includes("unavailable"))return "Sin conexión. Revise el internet e intente de nuevo.";
+  return "No se pudo guardar. Intente de nuevo.";
+}
+function pagoTxt(u){
+  const p=pagos[u];if(!p||!p.pago)return "";
+  if(p.pago==="Bancario")return (p.banco==="Otra entidad"?(p.bancoOtro||"Otra entidad"):(p.banco||"Banco por definir"))+(p.proceso?" · "+p.proceso:"");
+  return PAGO_LBL[p.pago]||p.pago;
+}
+function show(view){["loginView","msgView","appView"].forEach(v=>$(v).hidden=v!==view)}
+function msg(title,text,withLogout){$("msgTitle").textContent=title;$("msgText").textContent=text||"";$("msgLogout").hidden=!withLogout;show("msgView")}
+
+/* ================== Acceso ================== */
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();$("lgErr").textContent="";$("lgBtn").disabled=true;
+  try{await api.login($("lgEmail").value.trim(),$("lgPass").value)}
+  catch(x){
+    const c=x?.code||"";
+    $("lgErr").textContent=c.includes("too-many")?"Demasiados intentos. Espere unos minutos.":
+      c.includes("network")?"Sin conexión a internet.":"Correo o contraseña incorrectos.";
+  }finally{$("lgBtn").disabled=false}
+});
+$("lgReset").onclick=async()=>{
+  const em=$("lgEmail").value.trim();
+  if(!em){$("lgErr").textContent="Escriba su correo arriba y vuelva a pulsar «Olvidé mi contraseña».";return}
+  try{await api.resetPw(em);$("lgErr").textContent="";toast("Le enviamos un correo para restablecer la contraseña.")}
+  catch(x){$("lgErr").textContent="No se pudo enviar el correo. Verifique la dirección."}
+};
+$("logoutBtn").onclick=$("msgLogout").onclick=()=>api.logout();
+$("pwBtn").onclick=()=>{$("pwPanel").hidden=false;$("usersPanel").hidden=true;$("pwOld").focus()};
+$("pwClose").onclick=()=>{$("pwPanel").hidden=true;$("pwForm").reset();$("pwErr").textContent=""};
+$("pwForm").addEventListener("submit",async e=>{
+  e.preventDefault();$("pwErr").textContent="";
+  try{await api.changePw($("pwOld").value,$("pwNew").value);$("pwForm").reset();$("pwPanel").hidden=true;toast("Contraseña actualizada.")}
+  catch(x){$("pwErr").textContent=(x?.code||"").includes("wrong-password")||(x?.code||"").includes("invalid-credential")?"La contraseña actual no es correcta.":(x?.code||"").includes("weak")?"La contraseña nueva debe tener al menos 6 caracteres.":"No se pudo cambiar la contraseña."}
+});
+
+function stopWatches(){unsubs.forEach(u=>{try{u()}catch(e){}});unsubs=[];citas={};pagos={};entregas={};usuarios={}}
+let profileUnsub=null;
+function onUser(u){
+  stopWatches();if(profileUnsub){profileUnsub();profileUnsub=null}
+  me=null;myId=null;formState=editorState=entregaState=confirmDel=null;
+  if(!u){show("loginView");return}
+  myId=u.uid;msg("Cargando…","");
+  profileUnsub=api.watchProfile(u.uid,p=>{
+    if(!p){msg("Cuenta sin acceso","Su usuario existe pero todavía no tiene un rol asignado. Pida a un administrador que le dé acceso.",true);stopWatches();return}
+    if(!p.activo){msg("Cuenta desactivada","Un administrador desactivó su acceso a la agenda.",true);stopWatches();return}
+    const first=!me;me=p;
+    isAdmin=p.rol==="admin";canWrite=isAdmin||p.rol==="agenda";
+    $("ubName").textContent=p.nombre||u.email;$("ubRole").textContent=ROL_LBL[p.rol]||p.rol;
+    $("usersBtn").hidden=!isAdmin;if(!isAdmin)$("usersPanel").hidden=true;
+    $("banner").hidden=canWrite;if(!canWrite)$("banner").textContent="Tiene acceso de solo lectura.";
+    if(first){startWatches();show("appView")}
+    renderRoster();
+    renderAll();
+  },()=>msg("Sin conexión","No se pudo cargar su perfil. Revise el internet y recargue la página.",true));
+}
+function startWatches(){
+  const fail=()=>{$("banner").hidden=false;$("banner").textContent="Se perdió la conexión con la agenda. Recargue la página."};
+  unsubs.push(api.watch("citas",m=>{citas=m;if(formState?.editId&&!citas[formState.editId])formState=null;renderAll()},fail));
+  unsubs.push(api.watch("unidades",m=>{pagos=m;renderAll()},fail));
+  unsubs.push(api.watch("entregas",m=>{entregas=m;renderAll()},fail));
+  unsubs.push(api.watch("usuarios",m=>{usuarios=m;renderAll();renderUsers()},()=>{}));
+  unsubs.push(api.watch("config",m=>{
+    const r=m.propietarios;rosterInfo=r||null;UNITS=(r?.lista||[]).slice().sort((a,b)=>a.e-b.e||a.a.localeCompare(b.a));
+    UMAP=Object.fromEntries(UNITS.map(u=>[u.u,u]));renderRoster();renderAll();
+  },fail));
+}
+
+/* ================== Calendario ================== */
+function renderCal(){
+  $("monthLbl").textContent=MESES[viewM]+" "+viewY;
+  const bd=byDate();
+  let h=["lun","mar","mié","jue","vie","sáb","dom"].map(d=>`<div class="dow">${d}</div>`).join("");
+  const first=new Date(viewY,viewM,1), offset=(first.getDay()+6)%7, start=new Date(viewY,viewM,1-offset);
+  for(let i=0;i<42;i++){
+    const d=new Date(start);d.setDate(start.getDate()+i);
+    if(i>=35&&d.getMonth()!==viewM)break;
+    const s=ymd(d), slots=slotsFor(s), list=(bd[s]||[]).sort((a,b)=>a.hora.localeCompare(b.hora));
+    const cls=["day"];
+    if(d.getMonth()!==viewM)cls.push("out");
+    if(!slots.length)cls.push("closed");
+    if(s<todayStr)cls.push("past");
+    if(s===todayStr)cls.push("today");
+    if(s===selDate)cls.push("sel");
+    const n=list.length;
+    let inner=`<div class="drow"><span class="dnum">${d.getDate()}</span>`;
+    if(slots.length)inner+=`<span class="cap${n>=slots.length?" full":""}">${n}/${slots.length}</span>`;
+    inner+=`</div>`;
+    if(!slots.length)inner+=`<span class="closedlbl">Cerrado</span>`;
+    const ab=abrenEn(s);if(ab.length)inner+=`<span class="opens" title="Edificios habilitados desde este día">Abre Edif. ${ab.join("·")}</span>`;
+    if(slots.length)inner+=`<div class="chips">`+list.map(c=>`<span class="chip${c.estado==="Realizada"?" done":c.estado==="No asistió"?" miss":""}" title="${esc(hr12(c.hora)+" · "+(UMAP[c.unidad]?.p||""))}">${esc(c.unidad)}</span>`).join("")+`</div>`;
+    h+=slots.length?`<button class="${cls.join(" ")}" data-d="${s}" aria-label="${esc(fmtLong(s))}: ${n} de ${slots.length} citas">${inner}</button>`
+                   :`<div class="${cls.join(" ")}" aria-label="${esc(fmtLong(s))}: cerrado">${inner}</div>`;
+  }
+  $("cal").innerHTML=h;
+}
+$("cal").addEventListener("click",e=>{
+  const b=e.target.closest("button.day");if(!b)return;
+  selDate=b.dataset.d;formState=null;confirmDel=null;editorState=null;renderCal();renderDay();
+});
+$("prevM").onclick=()=>{viewM--;if(viewM<0){viewM=11;viewY--}renderCal()};
+$("nextM").onclick=()=>{viewM++;if(viewM>11){viewM=0;viewY++}renderCal()};
+$("todayM").onclick=()=>{viewY=now.getFullYear();viewM=now.getMonth();selDate=todayStr;formState=null;renderCal();renderDay()};
+
+/* ================== Panel del día ================== */
+function renderDay(){
+  const slots=slotsFor(selDate);
+  $("dayTitle").textContent=fmtLong(selDate).replace(/^./,c=>c.toUpperCase());
+  const body=$("dayBody"), past=selDate<todayStr;
+  if(!slots.length){$("dayEyebrow").textContent="Cerrado";body.innerHTML=`<p class="empty">Domingo: no se agendan inspecciones.</p>`;return}
+  const taken=Object.fromEntries((byDate()[selDate]||[]).map(c=>[c.hora,c]));
+  $("dayEyebrow").textContent=`${Object.keys(taken).length} de ${slots.length} turnos ocupados`+(past?" · día pasado":"");
+  const hab=habilitados(selDate);
+  let h=`<div class="habil">${hab.length?`Edificios habilitados: <strong>${hab.join(", ")}</strong>`:"Ningún edificio habilitado todavía para este día."}</div><div class="slots">`;
+  for(const hr of slots){
+    const c=taken[hr];
+    if(c){
+      const u=UMAP[c.unidad]||{}, en=entregas[c.unidad];
+      h+=`<div class="slot"><div class="hr">${hr12(hr).replace(" ","<br>")}</div><div>
+        <div><span class="unit">${esc(unitLbl(c.unidad))}</span> <span class="tipo">${esc(TIPOS[c.tipo]||c.tipo)}</span><span class="pill ${pillCls(c.estado)}">${esc(c.estado)}</span></div>
+        <div class="who">${esc(u.p||"")}</div>
+        <div class="meta">${c.telefono?"Tel. "+esc(c.telefono)+" · ":""}${c.notas?esc(c.notas)+" · ":""}Agendó: ${esc(nameOf(c.creadoPor))}${c.reprogramadaDesde?" · Reprogramada desde "+esc(c.reprogramadaDesde):""}</div>
+        <div class="meta">${c.estado==="Realizada"&&c.realizadaEl?`<strong class="okt">Realizada el ${fmtShort(c.realizadaEl)}</strong> · `:""}Pago: ${esc(pagoTxt(c.unidad)||"por definir")}${en?.entregada?` · <strong class="okt">Unidad entregada el ${fmtShort(en.fecha)}</strong>`:""}</div>
+        ${canWrite?`<div class="acts">
+          ${c.estado!=="Realizada"?`<button class="btn small primary" data-act="done" data-id="${c.id}">Marcar realizada</button>`:""}
+          <button class="btn small" data-act="pago" data-id="${c.id}">Forma de pago</button>
+          ${c.estado!=="No asistió"?`<button class="btn small" data-act="miss" data-id="${c.id}">No asistió</button>`:""}
+          ${c.estado!=="Agendada"?`<button class="btn small" data-act="reset" data-id="${c.id}">Volver a agendada</button>`:""}
+          <button class="btn small" data-act="move" data-id="${c.id}">Reprogramar</button>
+          <button class="btn small danger" data-act="del" data-id="${c.id}">Cancelar cita</button>
+        </div>`:""}
+        ${confirmDel===c.id?`<div class="confirm">¿Cancelar la cita de ${esc(c.unidad)}? El turno quedará libre.
+          <button class="btn small danger" data-act="delok" data-id="${c.id}">Sí, cancelar</button>
+          <button class="btn small" data-act="delno">No</button></div>`:""}
+        ${editorState?.where==="day"&&editorState.citaId===c.id?editorHtml():""}
+      </div></div>`;
+    }else{
+      h+=`<div class="slot free"><div class="hr">${hr12(hr).replace(" ","<br>")}</div><div>
+        ${past?`<span class="empty">Sin cita</span>`:canWrite?`<button class="btn small primary" data-act="new" data-h="${hr}">Agendar en este turno</button>`:`<span class="empty">Disponible</span>`}
+      </div></div>`;
+    }
+  }
+  h+=`</div>`;
+  if(formState)h+=formHtml();
+  body.innerHTML=h;
+  if(formState)bindForm();
+  bindEditor();
+}
+
+/* ---- Formulario de cita ---- */
+function formHtml(){
+  const f=formState, editing=f.editId?citas[f.editId]:null;
+  const freeSlots=slotsFor(f.fecha).filter(h=>{const id=slotId(f.fecha,h);return !citas[id]||id===f.editId});
+  return `<form class="book" id="bookForm" autocomplete="off">
+    <h3>${editing?"Reprogramar cita de "+esc(editing.unidad):"Nueva cita"}</h3>
+    <div class="field"><label for="fUnit">Unidad</label>
+      <input id="fUnit" list="unitList" value="${esc(f.unidad||"")}" placeholder="Ej. 6-101 o nombre" ${editing?"readonly":""} required>
+      <datalist id="unitList">${UNITS.filter(u=>HABIL[u.e]<=f.fecha).map(u=>`<option value="${u.u}">${esc(u.p)}</option>`).join("")}</datalist>
+      <div class="owner" id="fOwner"></div></div>
+    <div class="row2">
+      <div class="field"><label for="fTipo">Tipo</label><select id="fTipo" ${editing?"disabled":""}>
+        <option value="1ra"${f.tipo==="1ra"?" selected":""}>1ra inspección</option>
+        <option value="2da"${f.tipo==="2da"?" selected":""}>2da inspección</option></select></div>
+      <div class="field"><label for="fFecha">Fecha</label><input id="fFecha" type="date" min="${todayStr}" value="${f.fecha}" required></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="fHora">Hora</label><select id="fHora">${freeSlots.map(h=>`<option value="${h}"${h===f.hora?" selected":""}>${hr12(h)}</option>`).join("")||`<option value="">Sin turnos libres</option>`}</select></div>
+      <div class="field"><label for="fTel">Teléfono (opcional)</label><input id="fTel" type="tel" value="${esc(f.telefono||"")}"></div>
+    </div>
+    <div class="field"><label for="fNotas">Notas (opcional)</label><input id="fNotas" value="${esc(f.notas||"")}" placeholder="Inspector, acompañante, banco…"></div>
+    <div class="err" id="fErr"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" type="submit" id="fSave">${editing?"Guardar nueva fecha":"Agendar cita"}</button><button class="btn" type="button" id="fCancel">Cerrar</button></div>
+  </form>`;
+}
+function resolveUnit(v){
+  v=(v||"").trim().toUpperCase();if(!v)return null;
+  if(UMAP[v])return v;
+  const compact=v.replace(/[^0-9]/g,"");
+  const byNum=UNITS.find(u=>(u.e+u.a)===compact);if(byNum)return byNum.u;
+  const byName=UNITS.filter(u=>u.p.includes(v));return byName.length===1?byName[0].u:null;
+}
+function bindForm(){
+  const sync=()=>{const u=resolveUnit($("fUnit").value), x=u&&UMAP[u], fd=$("fFecha").value;
+    $("fOwner").textContent=x?(x.p+(x.s!=="Vendido"?" ("+x.s+")":"")+(fd&&HABIL[x.e]>fd?" · Edif. "+x.e+" no habilitado hasta el "+fmtShort(HABIL[x.e]):"")):($("fUnit").value?"Unidad no encontrada":"")};
+  sync();
+  $("fUnit").addEventListener("input",()=>{formState.unidad=$("fUnit").value;sync()});
+  $("fTipo").addEventListener("change",()=>formState.tipo=$("fTipo").value);
+  $("fTel").addEventListener("input",()=>formState.telefono=$("fTel").value);
+  $("fNotas").addEventListener("input",()=>formState.notas=$("fNotas").value);
+  $("fHora").addEventListener("change",()=>formState.hora=$("fHora").value);
+  $("fFecha").addEventListener("change",()=>{const v=$("fFecha").value;if(!v)return;formState.fecha=v;formState.hora=null;renderDay();
+    if(!slotsFor(v).length)$("fErr").textContent="Los domingos no se agendan inspecciones."});
+  $("fCancel").onclick=()=>{formState=null;renderDay()};
+  $("bookForm").addEventListener("submit",e=>{e.preventDefault();saveCita()});
+  if(!formState.hora)formState.hora=$("fHora").value||null;
+}
+async function saveCita(){
+  const err=m=>{$("fErr").textContent=m}, f=formState;
+  const u=resolveUnit($("fUnit").value);
+  if(!u)return err("Seleccione una unidad válida de la lista.");
+  const fecha=$("fFecha").value, hora=$("fHora").value, tipo=$("fTipo").value;
+  if(!fecha)return err("Indique la fecha.");
+  if(fecha<todayStr)return err("No se puede agendar en una fecha pasada.");
+  const slots=slotsFor(fecha);
+  if(!slots.length)return err("Los domingos no se agendan inspecciones.");
+  if(!hora||!slots.includes(hora))return err("Ese día no tiene turnos libres. Elija otra fecha.");
+  const ed=UMAP[u].e;
+  if(fecha<HABIL[ed])return err(`El Edificio ${ed} no está habilitado para inspección hasta el ${fmtShort(HABIL[ed])}. Elija esa fecha o una posterior.`);
+  const dup=unitCitas(u).find(c=>c.tipo===tipo&&c.id!==f.editId&&c.estado!=="No asistió");
+  if(dup)return err(`${u} ya tiene ${TIPOS[tipo]} el ${fmtShort(dup.fecha)} a las ${hr12(dup.hora)}. Reprograme esa cita en vez de crear otra.`);
+  const id=slotId(fecha,hora);
+  if(id===f.editId){formState=null;renderDay();return}
+  if(citas[id])return err("Ese turno acaba de ser tomado. Elija otro.");
+  const prev=f.editId?citas[f.editId]:null;
+  const body={unidad:u,tipo,fecha,hora,estado:"Agendada",telefono:$("fTel").value.trim(),notas:$("fNotas").value.trim(),
+    creadoPor:prev?.creadoPor||myId,creadoEn:prev?.creadoEn||new Date().toISOString(),...stamp()};
+  if(prev)body.reprogramadaDesde=(prev.reprogramadaDesde?prev.reprogramadaDesde+", ":"")+fmtShort(prev.fecha)+" "+hr12(prev.hora);
+  $("fSave").disabled=true;
+  try{
+    await api.book(id,body,f.editId||null);
+    formState=null;selDate=fecha;const d=parse(fecha);viewY=d.getFullYear();viewM=d.getMonth();
+    toast(prev?`Cita de ${u} movida al ${fmtShort(fecha)}, ${hr12(hora)}`:`Cita agendada: ${u}, ${fmtShort(fecha)} ${hr12(hora)}`);
+    renderAll();
+  }catch(x){$("fSave").disabled=false;err(errMsg(x))}
+}
+
+$("dayBody").addEventListener("click",async e=>{
+  const b=e.target.closest("button[data-act]");if(!b)return;
+  const act=b.dataset.act,id=b.dataset.id;
+  if(act==="new"){formState={fecha:selDate,hora:b.dataset.h,tipo:"1ra"};editorState=null;renderDay();$("fUnit")?.focus();return}
+  if(act==="move"){const c=citas[id];formState={editId:id,unidad:c.unidad,tipo:c.tipo,fecha:c.fecha,hora:c.hora,telefono:c.telefono,notas:c.notas};editorState=null;renderDay();return}
+  if(act==="done"||act==="pago"){openEditor(act==="done"?"realizar":"pago","day",citas[id].unidad,id);return}
+  if(act==="del"){confirmDel=id;renderDay();return}
+  if(act==="delno"){confirmDel=null;renderDay();return}
+  b.disabled=true;
+  try{
+    if(act==="delok"){const c=citas[id];await api.cancel(id,c.unidad,c.tipo);confirmDel=null;toast("Cita cancelada. El turno quedó libre.")}
+    else{const estado={miss:"No asistió",reset:"Agendada"}[act];await api.updateCita(id,{estado,realizadaEl:"",...stamp()})}
+  }catch(x){b.disabled=false;toast(errMsg(x))}
+});
+
+/* ---- Inspección realizada / forma de pago ---- */
+function openEditor(mode,where,unit,citaId){
+  const p=pagos[unit]||{}, c=citaId?citas[citaId]:null;
+  editorState={mode,where,unit,citaId,pago:p.pago||"",banco:p.banco||"",bancoOtro:p.bancoOtro||"",proceso:p.proceso||"",observaciones:p.observaciones||"",
+    fecha:c?(c.fecha<todayStr?c.fecha:todayStr):todayStr};
+  formState=null;confirmDel=null;entregaState=null;renderDay();renderTable();$("pgTipo")?.focus();
+}
+function editorHtml(){
+  const e=editorState;
+  return `<form class="book" id="pgForm" autocomplete="off">
+    <h3>${e.mode==="realizar"?"Registrar inspección realizada":"Forma de pago"} · ${esc(e.unit)}</h3>
+    <div class="owner">${esc(UMAP[e.unit]?.p||"")}</div>
+    ${e.mode==="realizar"?`<div class="field"><label for="pgFecha">Fecha en que se realizó</label><input id="pgFecha" type="date" max="${todayStr}" data-k="fecha"></div>`:""}
+    <div class="field"><label for="pgTipo">Forma de pago del saldo</label><select id="pgTipo" data-k="pago"><option value="">Por definir</option><option value="Bancario">Financiamiento bancario</option><option value="Efectivo">Pago en efectivo</option><option value="Permuta">Saldo por permuta</option></select></div>
+    <div class="field" id="pgBancoF"><label for="pgBanco">Entidad financiera</label><select id="pgBanco" data-k="banco"><option value="">Por definir</option>${BANCOS.map(([g,l])=>`<optgroup label="${g}">${l.map(b=>`<option>${esc(b)}</option>`).join("")}</optgroup>`).join("")}</select></div>
+    <div class="field" id="pgOtroF"><label for="pgOtro">Nombre de la entidad</label><input id="pgOtro" data-k="bancoOtro"></div>
+    <div class="field" id="pgProcF"><label for="pgProc">Estado del trámite bancario</label><select id="pgProc" data-k="proceso"><option value="">Sin indicar</option><option>No sometido</option><option>Sometido</option><option>En proceso</option><option>Aprobado</option></select></div>
+    <div class="field"><label for="pgObs">Observaciones</label><input id="pgObs" data-k="observaciones" placeholder="Monto de permuta, oficial de crédito…"></div>
+    <div class="err" id="pgErr"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" type="submit" id="pgSave">${e.mode==="realizar"?"Confirmar inspección realizada":"Guardar forma de pago"}</button><button class="btn" type="button" id="pgClose">Cerrar</button></div>
+  </form>`;
+}
+function bindEditor(){
+  const f=$("pgForm");if(!f||f.dataset.bound)return;f.dataset.bound="1";
+  const vis=()=>{const b=editorState.pago==="Bancario";$("pgBancoF").hidden=!b;$("pgProcF").hidden=!b;$("pgOtroF").hidden=!(b&&editorState.banco==="Otra entidad")};
+  f.querySelectorAll("[data-k]").forEach(el=>{el.value=editorState[el.dataset.k]||"";
+    el.addEventListener(el.tagName==="SELECT"?"change":"input",()=>{editorState[el.dataset.k]=el.value;vis()})});
+  vis();
+  $("pgClose").onclick=()=>{editorState=null;renderDay();renderTable()};
+  f.addEventListener("submit",ev=>{ev.preventDefault();saveEditor()});
+}
+async function saveEditor(){
+  const e=editorState, err=m=>{$("pgErr").textContent=m};
+  if(e.mode==="realizar"&&!e.fecha)return err("Indique la fecha en que se realizó la inspección.");
+  if(e.mode==="realizar"&&e.fecha>todayStr)return err("La fecha de realización no puede ser futura.");
+  if(e.pago==="Bancario"&&e.banco==="Otra entidad"&&!e.bancoOtro.trim())return err("Escriba el nombre de la entidad financiera.");
+  $("pgSave").disabled=true;
+  try{
+    const b=e.pago==="Bancario";
+    await api.set("unidades",e.unit,{pago:e.pago,banco:b?e.banco:"",bancoOtro:b&&e.banco==="Otra entidad"?e.bancoOtro.trim():"",proceso:b?e.proceso:"",observaciones:e.observaciones.trim(),...stamp()});
+    if(e.mode==="realizar"&&e.citaId)await api.updateCita(e.citaId,{estado:"Realizada",realizadaEl:e.fecha,...stamp()});
+    toast(e.mode==="realizar"?`Inspección de ${e.unit} registrada como realizada`:`Forma de pago de ${e.unit} guardada`);
+    editorState=null;renderAll();
+  }catch(x){$("pgSave").disabled=false;err(errMsg(x))}
+}
+
+/* ---- Entrega de unidades ---- */
+function openEntrega(unit){
+  const x=entregas[unit]||{};
+  entregaState={unit,fecha:x.fecha||todayStr,recibe:x.recibe||"",obs:x.obs||"",confirmUndo:false};
+  editorState=null;formState=null;renderDay();renderTable();$("enFecha")?.focus();
+}
+function entregaHtml(){
+  const s=entregaState, ya=entregas[s.unit]?.entregada, insp=unitCitas(s.unit).some(c=>c.estado==="Realizada");
+  return `<form class="book" id="enForm" autocomplete="off">
+    <h3>${ya?"Entrega registrada":"Registrar entrega"} · ${esc(s.unit)}</h3>
+    <div class="owner">${esc(UMAP[s.unit]?.p||"")}</div>
+    ${insp?"":`<div class="habil">Esta unidad no tiene inspección realizada registrada.</div>`}
+    <div class="row2">
+      <div class="field"><label for="enFecha">Fecha de entrega</label><input id="enFecha" type="date" max="${todayStr}" data-k="fecha" ${canWrite?"":"disabled"}></div>
+      <div class="field"><label for="enRecibe">Recibida por</label><input id="enRecibe" data-k="recibe" placeholder="Propietario o representante" ${canWrite?"":"disabled"}></div>
+    </div>
+    <div class="field"><label for="enObs">Observaciones</label><input id="enObs" data-k="obs" placeholder="Llaves, acta, pendientes…" ${canWrite?"":"disabled"}></div>
+    <div class="err" id="enErr"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${canWrite?`<button class="btn primary" type="submit" id="enSave">${ya?"Guardar cambios":"Confirmar entrega"}</button>${ya?`<button class="btn danger" type="button" id="enUndo">Anular entrega</button>`:""}`:""}<button class="btn" type="button" id="enClose">Cerrar</button></div>
+    ${s.confirmUndo?`<div class="confirm">¿Anular la entrega de ${esc(s.unit)}? La unidad volverá a pendiente.
+      <button class="btn small danger" type="button" id="enUndoOk">Sí, anular</button><button class="btn small" type="button" id="enUndoNo">No</button></div>`:""}
+  </form>`;
+}
+function bindEntrega(){
+  const f=$("enForm");if(!f||f.dataset.bound)return;f.dataset.bound="1";
+  f.querySelectorAll("[data-k]").forEach(el=>{el.value=entregaState[el.dataset.k]||"";el.addEventListener("input",()=>entregaState[el.dataset.k]=el.value)});
+  $("enClose").onclick=()=>{entregaState=null;renderTable()};
+  if($("enUndo"))$("enUndo").onclick=()=>{entregaState.confirmUndo=true;renderTable()};
+  if($("enUndoNo"))$("enUndoNo").onclick=()=>{entregaState.confirmUndo=false;renderTable()};
+  if($("enUndoOk"))$("enUndoOk").onclick=async()=>{
+    try{await api.del("entregas",entregaState.unit);toast(`Entrega de ${entregaState.unit} anulada`);entregaState=null;renderAll()}
+    catch(x){$("enErr").textContent=errMsg(x)}
+  };
+  f.addEventListener("submit",async ev=>{
+    ev.preventDefault();const s=entregaState,err=m=>$("enErr").textContent=m;
+    if(!s.fecha)return err("Indique la fecha de entrega.");
+    if(s.fecha>todayStr)return err("La fecha de entrega no puede ser futura.");
+    $("enSave").disabled=true;
+    try{await api.set("entregas",s.unit,{entregada:true,fecha:s.fecha,recibe:s.recibe.trim(),obs:s.obs.trim(),...stamp()});
+      toast(`Unidad ${s.unit} marcada como entregada`);entregaState=null;renderAll()}
+    catch(x){$("enSave").disabled=false;err(errMsg(x))}
+  });
+}
+
+/* ================== Listado de unidades ================== */
+const fEd=$("fEd");
+for(let i=1;i<=9;i++)fEd.insertAdjacentHTML("beforeend",`<option value="${i}">Edificio ${i} · desde ${fmtShort(HABIL[i]).slice(0,5)}</option>`);
+["q","fEd","fSt"].forEach(id=>$(id).addEventListener("input",renderTable));
+function cellFor(list,tipo){
+  const c=list.filter(x=>x.tipo===tipo).sort((a,b)=>(b.fecha+b.hora).localeCompare(a.fecha+a.hora))[0];
+  if(!c)return `<span class="dash">—</span>`;
+  return `${fmtShort(c.fecha)} ${hr12(c.hora)}<br><span class="st">${esc(c.estado)}${c.estado==="Realizada"&&c.realizadaEl?" el "+fmtShort(c.realizadaEl):""}</span>`;
+}
+function renderTable(){
+  const q=$("q").value.trim().toUpperCase(), ed=fEd.value, st=$("fSt").value;
+  const rows=UNITS.filter(u=>{
+    if(ed&&String(u.e)!==ed)return false;
+    if(q&&!(u.u.includes(q)||(u.e+u.a).includes(q.replace(/\D/g,"")||"@")||u.p.includes(q)))return false;
+    const l=unitCitas(u.u);
+    if(st==="sin"&&l.some(c=>c.estado!=="No asistió"))return false;
+    if(st==="ag"&&!l.some(c=>c.estado==="Agendada"))return false;
+    if(st==="re"&&!l.some(c=>c.estado==="Realizada"))return false;
+    if(st==="ent"&&!entregas[u.u]?.entregada)return false;
+    if(st==="noent"&&entregas[u.u]?.entregada)return false;
+    return true;
+  });
+  $("tbody").innerHTML=rows.map(u=>{
+    const l=unitCitas(u.u), en=entregas[u.u]?.entregada?entregas[u.u]:null;
+    const next=l.filter(c=>c.estado==="Agendada").sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora))[0];
+    return `<tr class="${next?"clickable":""}" ${next?`data-go="${next.fecha}"`:""}><td class="u">${u.u}</td><td>${esc(u.p)}${u.s!=="Vendido"?` <span class="st">(${esc(u.s)})</span>`:""}</td><td class="d">${cellFor(l,"1ra")}</td><td class="d">${cellFor(l,"2da")}</td>
+      <td class="pg">${pagoTxt(u.u)?esc(pagoTxt(u.u)):`<span class="dash">Por definir</span>`}${canWrite?` <button class="btn small" data-pg="${u.u}">Editar</button>`:""}</td>
+      <td class="en">${en?`<span class="pill Realizada">Entregada</span> <span class="st">${fmtShort(en.fecha)}</span>`:`<span class="dash">Pendiente</span>`}${canWrite||en?` <button class="btn small" data-en="${u.u}">${en?"Ver":"Entregar"}</button>`:""}</td></tr>`
+      +(editorState?.where==="table"&&editorState.unit===u.u?`<tr class="edrow"><td colspan="6">${editorHtml()}</td></tr>`:"")
+      +(entregaState?.unit===u.u?`<tr class="edrow"><td colspan="6">${entregaHtml()}</td></tr>`:"");
+  }).join("")||`<tr><td colspan="6" class="empty">Ninguna unidad coincide con el filtro.</td></tr>`;
+  bindEditor();bindEntrega();
+}
+$("tbody").addEventListener("click",e=>{
+  const pb=e.target.closest("button[data-pg]");if(pb){openEditor("pago","table",pb.dataset.pg,null);return}
+  const eb=e.target.closest("button[data-en]");if(eb){openEntrega(eb.dataset.en);return}
+  if(e.target.closest("#pgForm,#enForm"))return;
+  const tr=e.target.closest("tr[data-go]");if(!tr)return;
+  selDate=tr.dataset.go;const d=parse(selDate);viewY=d.getFullYear();viewM=d.getMonth();formState=null;
+  renderCal();renderDay();$("cal").scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+function renderStats(){
+  const all=Object.values(citas);
+  $("stAg").textContent=all.filter(c=>c.estado==="Agendada").length;
+  $("stRe").textContent=all.filter(c=>c.estado==="Realizada").length;
+  const has1=new Set(all.filter(c=>c.tipo==="1ra"&&c.estado!=="No asistió").map(c=>c.unidad));
+  $("stPend").textContent=UNITS.length-has1.size;
+  $("stEnt").textContent=Object.values(entregas).filter(x=>x.entregada).length;
+  $("stEntLbl").textContent="unidades entregadas de "+UNITS.length;
+}
+function renderAll(){
+  const t=ymd(new Date());if(t!==todayStr){now=new Date();todayStr=t}
+  if(!me)return;renderStats();renderCal();renderDay();renderTable();
+}
+
+/* ================== Usuarios (administrador) ================== */
+$("usersBtn").onclick=()=>{$("usersPanel").hidden=false;$("pwPanel").hidden=true;renderUsers();$("usersPanel").scrollIntoView({behavior:"smooth"})};
+$("usersClose").onclick=()=>{$("usersPanel").hidden=true};
+function renderUsers(){
+  if(!isAdmin)return;
+  const list=Object.entries(usuarios).sort((a,b)=>(a[1].nombre||"").localeCompare(b[1].nombre||""));
+  $("usersBody").innerHTML=list.map(([uid,u])=>{
+    const self=uid===myId;
+    return `<tr><td>${esc(u.nombre||"")}${self?' <span class="st">(usted)</span>':""}</td><td>${esc(u.email||"")}</td>
+      <td><select data-urol="${uid}" ${self?"disabled":""} aria-label="Rol de ${esc(u.nombre||"")}">${Object.entries(ROL_LBL).map(([k,v])=>`<option value="${k}"${u.rol===k?" selected":""}>${v}</option>`).join("")}</select></td>
+      <td>${u.activo?'<span class="pill Realizada">Activo</span>':'<span class="pill NoAsistio">Desactivado</span>'}${self?"":` <button class="btn small" data-uact="${uid}">${u.activo?"Desactivar":"Activar"}</button>`}</td></tr>`;
+  }).join("")||`<tr><td colspan="4" class="empty">Sin usuarios.</td></tr>`;
+}
+$("usersBody").addEventListener("change",async e=>{
+  const s=e.target.closest("select[data-urol]");if(!s)return;
+  try{await api.updateUser(s.dataset.urol,{rol:s.value});toast("Rol actualizado.")}catch(x){toast(errMsg(x));renderUsers()}
+});
+$("usersBody").addEventListener("click",async e=>{
+  const b=e.target.closest("button[data-uact]");if(!b)return;const uid=b.dataset.uact;
+  b.disabled=true;
+  try{await api.updateUser(uid,{activo:!usuarios[uid].activo});toast(usuarios[uid]?.activo?"Usuario desactivado.":"Usuario activado.")}catch(x){b.disabled=false;toast(errMsg(x))}
+});
+$("nuForm").addEventListener("submit",async e=>{
+  e.preventDefault();$("nuErr").textContent="";
+  const nombre=$("nuNombre").value.trim(), email=$("nuEmail").value.trim().toLowerCase(), pass=$("nuPass").value, rol=$("nuRol").value;
+  if(pass.length<6){$("nuErr").textContent="La contraseña debe tener al menos 6 caracteres.";return}
+  $("nuBtn").disabled=true;
+  try{await api.createUser({nombre,email,pass,rol});$("nuForm").reset();toast(`Usuario creado: ${email}. Compártale su contraseña inicial.`)}
+  catch(x){const c=x?.code||"";$("nuErr").textContent=c.includes("email-already")?"Ya existe un usuario con ese correo.":c.includes("invalid-email")?"El correo no es válido.":errMsg(x)}
+  finally{$("nuBtn").disabled=false}
+});
+
+/* ================== Listado de propietarios ================== */
+function renderRoster(){
+  const n=UNITS.length;
+  $("rosterInfo").textContent=n?`${n} unidades cargadas${rosterInfo?.cargadoEn?" el "+fmtShort(rosterInfo.cargadoEn.slice(0,10)):""}${rosterInfo?.cargadoPor?" por "+nameOf(rosterInfo.cargadoPor):""}.`:"Todavía no se ha cargado el listado.";
+  $("rosterMissing").hidden=n>0;
+  $("rosterMissingTxt").textContent=isAdmin?"Falta cargar el listado de propietarios. Abra «Usuarios» y use «Cargar listado de propietarios» con el Excel de Etapa I.":"Falta cargar el listado de propietarios. Pida a un administrador que lo cargue.";
+}
+function loadXLSX(){return window.XLSX?Promise.resolve():new Promise((ok,ko)=>{const s=document.createElement("script");s.src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";s.onload=ok;s.onerror=ko;document.head.appendChild(s)})}
+function cleanName(v){let n=String(v??"").trim().replace(/\.+$/,"").replace(/\s+/g," ");return n===n.toUpperCase()?n:n.toUpperCase()}
+function parseRoster(rows){
+  // rows: arreglos de celdas. Busca la fila de encabezados con EDIFICIO / Apartamento / NOMBRE.
+  const hi=rows.findIndex(r=>r.some(c=>/edificio/i.test(c))&&r.some(c=>/apartamento|apto/i.test(c))&&r.some(c=>/nombre|adquiriente|cliente|propietario/i.test(c)));
+  if(hi<0)throw new Error("No encontré las columnas EDIFICIO, Apartamento y NOMBRE DEL ADQUIRIENTE.");
+  const H=rows[hi].map(c=>String(c));
+  const iE=H.findIndex(c=>/edificio/i.test(c)), iA=H.findIndex(c=>/apartamento|apto/i.test(c)),
+        iN=H.findIndex(c=>/nombre|adquiriente|propietario/i.test(c)), iS=H.findIndex(c=>/estatus|estado/i.test(c));
+  const out=[],bad=[];
+  for(const r of rows.slice(hi+1)){
+    if(r[iA]==null||String(r[iA]).trim()==="")continue;
+    const e=parseInt(r[iE],10);let a=String(r[iA]).trim().replace(/-/g,"");
+    a=a.startsWith(String(e))&&a.length>3?a.slice(String(e).length):a.slice(-3);
+    const u=e+"-"+a;
+    if(!/^[1-9]-[1-4]0[1-4]$/.test(u)){bad.push(String(r[iA]));continue}
+    out.push({u,e,a,p:cleanName(r[iN]),s:iS>=0?String(r[iS]??"").trim():""});
+  }
+  const ids=new Set(out.map(x=>x.u));
+  if(ids.size!==out.length)throw new Error("El listado tiene unidades repetidas.");
+  if(!out.length)throw new Error("No encontré unidades en el archivo.");
+  return {lista:out,bad};
+}
+$("rosterFile").addEventListener("change",async e=>{
+  const file=e.target.files[0];if(!file)return;$("rosterErr").textContent="";$("rosterOk").textContent="";
+  try{
+    await loadXLSX();
+    const wb=XLSX.read(await file.arrayBuffer(),{type:"array"});
+    const name=wb.SheetNames.find(n=>/clientes/i.test(n))||wb.SheetNames[0];
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:null,raw:false});
+    const {lista,bad}=parseRoster(rows);
+    await api.set("config","propietarios",{lista,cargadoEn:new Date().toISOString(),cargadoPor:myId,archivo:file.name});
+    $("rosterOk").textContent=`Listado cargado: ${lista.length} unidades (hoja «${name}»).`+(bad.length?` Se omitieron ${bad.length} filas con unidad no válida: ${bad.slice(0,5).join(", ")}.`:"");
+  }catch(x){$("rosterErr").textContent=x?.message&&!x.code?x.message:errMsg(x)}
+  finally{e.target.value=""}
+});
+
+/* ================== Exportar a Excel ================== */
+$("exportBtn").onclick=async()=>{
+  const btn=$("exportBtn");btn.disabled=true;
+  try{
+    await loadXLSX();
+    const citasRows=Object.values(citas).sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora)).map(c=>{
+      const u=UMAP[c.unidad]||{};
+      return {"Fecha":fmtShort(c.fecha),"Hora":hr12(c.hora),"Edificio":u.e,"Apartamento":u.a,"Unidad":c.unidad,"Propietario":u.p,"Tipo":TIPOS[c.tipo]||c.tipo,"Estado":c.estado,
+        "Realizada el":fmtShort(c.realizadaEl),"Teléfono":c.telefono||"","Notas":c.notas||"","Agendó":nameOf(c.creadoPor)};
+    });
+    const unitRows=UNITS.map(u=>{
+      const l=unitCitas(u.u), p=pagos[u.u]||{}, en=entregas[u.u]||{};
+      const last=t=>l.filter(c=>c.tipo===t).sort((a,b)=>(b.fecha+b.hora).localeCompare(a.fecha+a.hora))[0];
+      const c1=last("1ra"), c2=last("2da");
+      return {"Unidad":u.u,"Edificio":u.e,"Apartamento":u.a,"Propietario":u.p,"Estatus de venta":u.s,"Habilitado desde":fmtShort(HABIL[u.e]),
+        "1ra inspección":c1?fmtShort(c1.fecha)+" "+hr12(c1.hora):"","Estado 1ra":c1?.estado||"","2da inspección":c2?fmtShort(c2.fecha)+" "+hr12(c2.hora):"","Estado 2da":c2?.estado||"",
+        "Forma de pago":PAGO_LBL[p.pago]||"","Entidad financiera":p.pago==="Bancario"?(p.banco==="Otra entidad"?p.bancoOtro:p.banco)||"":"","Trámite bancario":p.proceso||"","Observaciones de pago":p.observaciones||"",
+        "Entregada":en.entregada?"Sí":"No","Fecha de entrega":fmtShort(en.fecha),"Recibida por":en.recibe||"","Observaciones de entrega":en.obs||""};
+    });
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(unitRows),"Unidades");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(citasRows.length?citasRows:[{"Fecha":"Sin citas"}]),"Citas");
+    XLSX.writeFile(wb,`Agenda_inspecciones_EtapaI_${todayStr}.xlsx`);
+  }catch(x){toast("No se pudo generar el Excel. Revise la conexión.")}
+  finally{btn.disabled=false}
+};
+
+/* ================== Instalar como app ================== */
+const isStandalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+function updateInstall(){const show=!isStandalone()&&(!!window.__bip||isIOS);document.querySelectorAll(".installBtn").forEach(b=>b.hidden=!show)}
+addEventListener("bip-ready",updateInstall);
+addEventListener("appinstalled",()=>{window.__bip=null;updateInstall();toast("App instalada. Ya puede abrirla desde su ícono.")});
+document.addEventListener("click",async e=>{
+  if(!e.target.closest(".installBtn"))return;
+  if(window.__bip){const p=window.__bip;p.prompt();try{await p.userChoice}catch(x){}window.__bip=null;updateInstall()}
+  else $("iosHelp").hidden=false;
+});
+$("iosClose").onclick=()=>$("iosHelp").hidden=true;
+updateInstall();
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"))
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+/* ================== Arranque ================== */
+async function startUI(theApi){
+  api=theApi;
+  api.onAuth(onUser);
+  setInterval(()=>{const t=ymd(new Date());if(t!==todayStr)renderAll()},60000);
+}
+
+/* ================== Conexión con Firebase ==================
+   Pegue aquí la configuración de su proyecto de Firebase
+   (Consola de Firebase → Configuración del proyecto → Tus apps → Configuración del SDK). */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBYJKh34ZRNHoZCXLh-j_F61AfIHHqJ71Y",
+  authDomain: "agenda-prado-suites.firebaseapp.com",
+  projectId: "agenda-prado-suites",
+  storageBucket: "agenda-prado-suites.firebasestorage.app",
+  messagingSenderId: "1035422545946",
+  appId: "1:1035422545946:web:682be31531eb1bede439a3"
+};
+
+const SDK = "https://www.gstatic.com/firebasejs/10.14.1/";
+
+async function firebaseApi(){
+  const {initializeApp, deleteApp} = await import(SDK+"firebase-app.js");
+  const A = await import(SDK+"firebase-auth.js");
+  const F = await import(SDK+"firebase-firestore.js");
+  const app = initializeApp(FIREBASE_CONFIG);
+  const auth = A.getAuth(app);
+  const db = F.initializeFirestore(app, {localCache: F.persistentLocalCache({tabManager: F.persistentMultipleTabManager()})});
+  const toMap = snap => { const m = {}; snap.forEach(d => m[d.id] = d.data()); return m; };
+  const userErr = m => Object.assign(new Error(m), {userMessage: m});
+
+  return {
+    onAuth: cb => A.onAuthStateChanged(auth, u => cb(u ? {uid: u.uid, email: u.email} : null)),
+    login: (email, pw) => A.signInWithEmailAndPassword(auth, email, pw),
+    logout: () => A.signOut(auth),
+    resetPw: email => A.sendPasswordResetEmail(auth, email),
+    changePw: async (oldPw, newPw) => {
+      const u = auth.currentUser;
+      await A.reauthenticateWithCredential(u, A.EmailAuthProvider.credential(u.email, oldPw));
+      await A.updatePassword(u, newPw);
+    },
+    watchProfile: (uid, cb, err) => F.onSnapshot(F.doc(db, "usuarios", uid), s => cb(s.exists() ? s.data() : null), err),
+    watch: (col, cb, err) => F.onSnapshot(F.collection(db, col), s => cb(toMap(s)), err),
+
+    // Agenda una cita (o la reprograma si se indica oldId) de forma atómica:
+    // el turno no puede estar tomado y la unidad no puede tener otra cita activa del mismo tipo.
+    book: (id, body, oldId) => F.runTransaction(db, async tx => {
+      const slotRef = F.doc(db, "citas", id);
+      const idxRef = F.doc(db, "indice", body.unidad + "_" + body.tipo);
+      const slot = await tx.get(slotRef);
+      if (slot.exists()) throw userErr("Ese turno ya fue tomado. Elija otro.");
+      const idx = await tx.get(idxRef);
+      if (idx.exists() && idx.data().cita !== oldId) {
+        const prev = await tx.get(F.doc(db, "citas", idx.data().cita));
+        if (prev.exists() && prev.data().estado !== "No asistió")
+          throw userErr(`${body.unidad} ya tiene una cita de ese tipo. Reprograme esa cita en vez de crear otra.`);
+      }
+      tx.set(slotRef, body);
+      tx.set(idxRef, {cita: id});
+      if (oldId) tx.delete(F.doc(db, "citas", oldId));
+    }),
+    cancel: (id, unidad, tipo) => F.runTransaction(db, async tx => {
+      const idxRef = F.doc(db, "indice", unidad + "_" + tipo);
+      const idx = await tx.get(idxRef);
+      tx.delete(F.doc(db, "citas", id));
+      if (idx.exists() && idx.data().cita === id) tx.delete(idxRef);
+    }),
+    updateCita: (id, patch) => F.updateDoc(F.doc(db, "citas", id), patch),
+    set: (col, id, data) => F.setDoc(F.doc(db, col, id), data),
+    del: (col, id) => F.deleteDoc(F.doc(db, col, id)),
+
+    // Crea la cuenta con una instancia secundaria para no cerrar la sesión del administrador.
+    createUser: async ({nombre, email, pass, rol}) => {
+      const sec = initializeApp(FIREBASE_CONFIG, "alta-" + Date.now());
+      try {
+        const cred = await A.createUserWithEmailAndPassword(A.getAuth(sec), email, pass);
+        await F.setDoc(F.doc(db, "usuarios", cred.user.uid), {nombre, email, rol, activo: true, creadoEn: new Date().toISOString()});
+        await A.signOut(A.getAuth(sec));
+      } finally { await deleteApp(sec); }
+    },
+    updateUser: (uid, patch) => F.updateDoc(F.doc(db, "usuarios", uid), patch)
+  };
+}
+
+(async () => {
+  if (window.AGENDA_TEST_API) { startUI(window.AGENDA_TEST_API); return; }
+  if (FIREBASE_CONFIG.apiKey === "PEGAR_AQUI") {
+    msg("Falta configurar Firebase", "Abra index.html y pegue la configuración de su proyecto de Firebase en FIREBASE_CONFIG (vea el archivo LEAME.md).");
+    return;
+  }
+  try { startUI(await firebaseApi()); }
+  catch (e) { msg("Sin conexión", "No se pudo cargar la aplicación. Revise el internet y recargue la página."); }
+})();
+
+</script>
+</body>
+</html>
